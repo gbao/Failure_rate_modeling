@@ -1,0 +1,6 @@
+streamlit
+plotly>=5.0
+numpy
+pandas
+openpyxl
+plotly.express
