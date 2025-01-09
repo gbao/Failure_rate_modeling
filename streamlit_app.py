@@ -214,7 +214,7 @@ def main():
         # Load the Excel file
         df = load_excel(uploaded_file)
         if df is not None:
-            st.subheader("Uploaded Data Preview")
+            st.subheader("Uploaded Failure rate Preview in [%]")
             
             # Extract the Blade column and convert it to a list
             input_dict = {col: (df[col] * 100).tolist() for col in df.columns}
