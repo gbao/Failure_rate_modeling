@@ -235,7 +235,7 @@ def main():
                 st.session_state.df_result = df, failure_count_df, mean_failure_counts
 
                 st.subheader("Simulation Results")
-                total_failure = failure_count_df["Failure_Count"].sum().iloc[1]
+                total_failure = failure_count_df["Failure_Count"].sum()
                 st.markdown(f"**Total Failures Across All Components:** {total_failure}")
 
                 n_failure = st.number_input("Show components with failures > n times", min_value=1, max_value=1000, value=2)
