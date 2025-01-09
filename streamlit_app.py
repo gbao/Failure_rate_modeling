@@ -370,7 +370,7 @@ def main():
                             """,unsafe_allow_html=True             
                 )    
 
-                n_failure = st.number_input("Input n to check how many components fail more than n times", min_value=1, max_value=1000, value=5)
+                n_failure = st.number_input("Input n to check how many components fail more than n times", min_value=1, max_value=1000, value=2)
                 filtered_failure_df = failure_count_df[failure_count_df['Failure_Count'] > n_failure]
                 component_count = filtered_failure_df.shape[0]
 
