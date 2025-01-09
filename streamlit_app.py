@@ -204,6 +204,11 @@ def main():
     # User inputs
     uploaded_file = st.file_uploader("Upload an Excel file", type=["xlsx"])
 
+    # Sidebar input 
+    n_turbine = st.number_input("Enter the number of turbines", min_value=1, max_value=150, value=30)
+    n_iterations = st.number_input("Enter the number of simulations", min_value=1, max_value=1000, value=10)
+    run_button = st.button("Run Simulation")
+
     if uploaded_file is not None:
         # Load the Excel file
         df = load_excel(uploaded_file)
@@ -214,28 +219,30 @@ def main():
             input_dict = {col: (df[col] * 100).tolist() for col in df.columns}
             
             # Show the first few rows of the file to the user
-            st.write(df.head())
+            df_review = df.applymap(lamda x:x *100 if np.issubdtype(type(x), np.number) else x)
+            st.write(df_review.head())
 
-            # Allow user to specify the number of turbines (iterations)
-            n_turbine = st.number_input("Enter the number of turbines of your project", min_value=1, max_value=150, value=30)
+            if run_button:
+                st.write("Running simulation.....")
+                st.session_state.run_clicked = True
+                st.session_state.simulation_results = run_simulation(input_dict, No_of_turbine=n_turbine, n=n_iterations)
 
-            # Allow user to specify the number of turbines (iterations)
-            n_iterations = st.number_input("Enter the number of simuation we need to run", min_value=1, max_value=1000, value=10)
-
-            # Create a button to trigger a new run of failure detection
-            rerun_button = st.button("Re-run Failure Detection")
-
-            # Initialize session state if not yet initialized
-            if "df_result" not in st.session_state:
-                st.session_state.df_result = None
-
-            if rerun_button or st.session_state.df_result is None:
-                # Run the turbine failure detection
-                st.write("Running failure detection...")
-                df_result, failure_count_df, mean_failure_counts = run_simulation(input_dict, No_of_turbine = n_turbine,n = n_iterations)
+            if st.session_state.run_clicked and st.session_state.simulation_results is not None:
+                df_result, failure_count_df, mean_failure_counts = st.session_state.simulation_results
 
                 # Store the result in session state so it can be reused
                 st.session_state.df_result = df, failure_count_df, mean_failure_counts
+
+                st.subheader("Simulation Results")
+                total_failure = failure_count_df["Failure_Count"].sum().iloc[1]
+                st.markdown(f"**Total Failures Across All Components:** {total_failure}")
+
+                n_failure = st.number_input("Show components with failures > n times", min_value=1, max_value=1000, value=2)
+
+                filtered_failure_df = failure_count_df[failure_count_df["Failure_Count"] > n_failure]
+                component_count = filtered_failure_df.shape[0]
+                st.write(component_count)
+
 
                 # Count failed turbines per year
                 failure_per_component_per_year_df = failure_summary_table(df_result, input_dict)
@@ -245,52 +252,6 @@ def main():
                 failure_per_turbine_per_year = summarize_failures_by_turbine(df_result,input_dict, n_iterations)
 
                 ##### Show the resulting dataframe ####
-                
-                # Show the summary of total failure 
-                total_failure = failure_count_df.sum().iloc[1]
-                st.markdown(
-                            f"""
-                            <div style="
-                                display: flex; 
-                                flex-direction: column;
-                                justify-content: center; 
-                                align-items: center; 
-                                height: 150px; 
-                                background-color: #ffcccc; 
-                                border: 2px solid #ff0000; 
-                                border-radius: 10px; 
-                                box-shadow: 0 4px 8px rgba(255, 0, 0, 0.4); 
-                                font-family: Arial, sans-serif;
-                                color: #660000;">
-                                <div style="font-size: 20px; font-weight: bold; margin-bottom: 10px;">Total Failure</div>
-                                <div style="font-size: 36px; font-weight: bold;">{total_failure}</div>
-                            </div>
-                            """,unsafe_allow_html=True             
-                )    
-
-                n_failure = st.number_input("Input n to check how many components fail more than n times", min_value=1, max_value=1000, value=5)
-                filtered_failure_df = failure_count_df[failure_count_df['Failure_Count'] > n_failure]
-                component_count = filtered_failure_df.shape[0]
-
-                st.markdown(
-                            f"""
-                            <div style="
-                                display: flex; 
-                                flex-direction: column;
-                                justify-content: center; 
-                                align-items: center; 
-                                height: 150px; 
-                                background-color: #ffcccc; 
-                                border: 2px solid #ff0000; 
-                                border-radius: 10px; 
-                                box-shadow: 0 4px 8px rgba(255, 0, 0, 0.4); 
-                                font-family: Arial, sans-serif;
-                                color: #660000;">
-                                <div style="font-size: 20px; font-weight: bold; margin-bottom: 10px;">Total Failure</div>
-                                <div style="font-size: 36px; font-weight: bold;">{component_count}</div>
-                            </div>
-                            """,unsafe_allow_html=True             
-                )    
 
                 st.subheader("Failure Counts Per Year")
                 st.write(df_result)
@@ -335,130 +296,6 @@ def main():
                 )
                 st.plotly_chart(fig1)
 
-            else:
-                # If no new run is triggered, use the stored result
-                df_result = st.session_state.df_result
-####
-                # Count failed turbines per year
-                failure_per_component_per_year_df = failure_summary_table(df_result, input_dict)
-                failure_per_year_df = sum_failure_per_year(failure_per_component_per_year_df)
-
-                 # Count number of time turbines failed
-                failure_per_turbine_per_year = summarize_failures_by_turbine(df_result,input_dict, n_iterations)
-
-                ##### Show the resulting dataframe ####
-                
-                # Show the summary of total failure 
-                total_failure = failure_count_df.sum().iloc[1]
-                st.markdown(
-                            f"""
-                            <div style="
-                                display: flex; 
-                                flex-direction: column;
-                                justify-content: center; 
-                                align-items: center; 
-                                height: 150px; 
-                                background-color: #ffcccc; 
-                                border: 2px solid #ff0000; 
-                                border-radius: 10px; 
-                                box-shadow: 0 4px 8px rgba(255, 0, 0, 0.4); 
-                                font-family: Arial, sans-serif;
-                                color: #660000;">
-                                <div style="font-size: 20px; font-weight: bold; margin-bottom: 10px;">Total Failure</div>
-                                <div style="font-size: 36px; font-weight: bold;">{total_failure}</div>
-                            </div>
-                            """,unsafe_allow_html=True             
-                )    
-
-                n_failure = st.number_input("Input n to check how many components fail more than n times", min_value=1, max_value=1000, value=2)
-                filtered_failure_df = failure_count_df[failure_count_df['Failure_Count'] > n_failure]
-                component_count = filtered_failure_df.shape[0]
-
-                st.markdown(
-                            f"""
-                            <div style="
-                                display: flex; 
-                                flex-direction: column;
-                                justify-content: center; 
-                                align-items: center; 
-                                height: 150px; 
-                                background-color: #ffcccc; 
-                                border: 2px solid #ff0000; 
-                                border-radius: 10px; 
-                                box-shadow: 0 4px 8px rgba(255, 0, 0, 0.4); 
-                                font-family: Arial, sans-serif;
-                                color: #660000;">
-                                <div style="font-size: 20px; font-weight: bold; margin-bottom: 10px;">Total Failure</div>
-                                <div style="font-size: 36px; font-weight: bold;">{component_count}</div>
-                            </div>
-                            """,unsafe_allow_html=True             
-                )    
-
-
-                # Show the resulting dataframe
-                st.subheader("Failure Counts Per Year")
-                st.write(df_result)
-                st.write(failure_per_year_df)
-                st.write(failure_per_turbine_per_year)
-
-
-                # Plot the results per component failure per year
-                failure_per_year_df_excluded = failure_per_year_df.iloc[:-1]
-                fig = px.bar(failure_per_year_df_excluded, 
-                            x=failure_per_year_df_excluded.index,
-                            y=failure_per_year_df_excluded.columns[:-1], 
-                            title="Stacked Bar Chart of Failures by Component",
-                            labels={"value": "Failures", "Year": "Year", "variable": "Component"}, 
-                            barmode='stack')
-                
-                # Add the scatter trace for the 'Total_Failure' column
-                fig.add_trace(
-                    go.Scatter(
-                        x=failure_per_year_df_excluded.index,
-                        y=failure_per_year_df_excluded["Total_Failure"],
-                        mode="text",
-                        text=failure_per_year_df_excluded["Total_Failure"],
-                        textposition="top center",
-                        showlegend=False
-                    )
-                )
-                st.plotly_chart(fig)
-
-                #Plot the second result
-                fig1 = px.bar(failure_per_turbine_per_year, y=failure_per_turbine_per_year.columns[:-1], title="Stacked Bar Chart of number of failures per Turbine",
-                            labels={"value": "Failures per Turbine", "Year": "Year", "variable": "Turbine"}, 
-                            barmode='stack')
-                fig1.add_trace(
-                    go.Scatter(
-                        x=failure_per_turbine_per_year.index,
-                        y=failure_per_turbine_per_year["Total_Failure"],
-                        mode="text",
-                        text=failure_per_turbine_per_year["Total_Failure"],
-                        textposition="top center",
-                        showlegend=False
-                    )
-                )
-                st.plotly_chart(fig1)
-
-
-
-            export_option = st.checkbox("Do you want to export the results to an Excel file?")
-            if export_option:
-                # Use the `with` statement to handle saving automatically
-                with pd.ExcelWriter("turbine_failure_analysis.xlsx", engine="openpyxl") as export_file:
-                    # Export all relevant DataFrames to separate sheets
-                    failure_per_year_df.to_excel(export_file, sheet_name="Total Failures")
-    
-                st.success("Excel file exported successfully!")
-
-                # Provide download link
-                with open("turbine_failure_analysis.xlsx", "rb") as f:
-                    st.download_button(
-                        label="Download Excel file",
-                        data=f,
-                        file_name="turbine_failure_analysis.xlsx",
-                        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                    )
 
 if __name__ == '__main__':
     main()
