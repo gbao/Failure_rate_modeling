@@ -205,9 +205,10 @@ def main():
     uploaded_file = st.file_uploader("Upload an Excel file", type=["xlsx"])
 
     # Sidebar input 
-    n_turbine = st.number_input("Enter the number of turbines", min_value=1, max_value=150, value=30)
-    n_iterations = st.number_input("Enter the number of simulations", min_value=1, max_value=1000, value=10)
-    run_button = st.button("Run Simulation")
+    with st.sidebar:
+        n_turbine = st.number_input("Enter the number of turbines", min_value=1, max_value=150, value=30)
+        n_iterations = st.number_input("Enter the number of simulations", min_value=1, max_value=1000, value=10)
+        run_button = st.button("Run Simulation")
 
     if uploaded_file is not None:
         # Load the Excel file
