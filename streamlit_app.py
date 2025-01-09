@@ -232,7 +232,7 @@ def main():
                 df_result, failure_count_df, mean_failure_counts = st.session_state.simulation_results
 
                 # Store the result in session state so it can be reused
-                st.session_state.df_result = df, failure_count_df, mean_failure_counts
+                st.session_state.df_result = df_result, failure_count_df, mean_failure_counts
 
                 st.subheader("Simulation Results")
                 total_failure = failure_count_df["Failure_Count"].sum()
