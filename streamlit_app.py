@@ -232,7 +232,7 @@ def main():
             if rerun_button or st.session_state.df_result is None:
                 # Run the turbine failure detection
                 st.write("Running failure detection...")
-                df, failure_count_df, mean_failure_counts = run_simulation(input_dict, No_of_turbine = n_turbine,n = n_iterations)
+                df_result, failure_count_df, mean_failure_counts = run_simulation(input_dict, No_of_turbine = n_turbine,n = n_iterations)
 
                 # Store the result in session state so it can be reused
                 st.session_state.df_result = df, failure_count_df, mean_failure_counts
