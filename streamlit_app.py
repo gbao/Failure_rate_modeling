@@ -219,7 +219,7 @@ def main():
             input_dict = {col: (df[col] * 100).tolist() for col in df.columns}
             
             # Show the first few rows of the file to the user
-            df_review = df.applymap(lamda x:x *100 if np.issubdtype(type(x), np.number) else x)
+            df_review = df.applymap(lambda x:x *100 if np.issubdtype(type(x), np.number) else x)
             st.write(df_review.head())
 
             if run_button:
