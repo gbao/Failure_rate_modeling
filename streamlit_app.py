@@ -247,7 +247,7 @@ def main():
                 ##### Show the resulting dataframe ####
                 
                 # Show the summary of total failure 
-                total_failure = failure_count_df.sum()
+                total_failure = failure_count_df.sum().iloc[1]
                 st.markdown(
                             f"""
                             <div style="
@@ -349,7 +349,7 @@ def main():
                 ##### Show the resulting dataframe ####
                 
                 # Show the summary of total failure 
-                total_failure = failure_count_df.sum()
+                total_failure = failure_count_df.sum().iloc[1]
                 st.markdown(
                             f"""
                             <div style="
