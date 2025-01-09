@@ -288,9 +288,9 @@ def main():
                 fig1.add_trace(
                     go.Scatter(
                         x=failure_per_turbine_per_year.index,
-                        y=failure_per_turbine_per_year["Total_Failure"],
+                        y=failure_per_turbine_per_year["Total_Failures"],
                         mode="text",
-                        text=failure_per_turbine_per_year["Total_Failure"],
+                        text=failure_per_turbine_per_year["Total_Failures"],
                         textposition="top center",
                         showlegend=False
                     )
