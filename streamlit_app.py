@@ -173,9 +173,9 @@ def summarize_failures_by_turbine(df, input_dict, no_of_turbines):
             lambda row: (row == "Failed").sum(), axis=1
         )
 
-    # Optionally, add a total failures column
+    # Add a total failures column and row
     summary["Total_Failures"] = summary.sum(axis=1)
-
+    summary.loc['Total'] = summary.sum(axis=0)
     return summary
 
 
