@@ -250,7 +250,7 @@ def main():
                 failure_per_year_df = sum_failure_per_year(failure_per_component_per_year_df)
 
                  # Count number of time turbines failed
-                failure_per_turbine_per_year = summarize_failures_by_turbine(df_result,input_dict, n_iterations)
+                failure_per_turbine_per_year = summarize_failures_by_turbine(df_result,input_dict, n_turbine)
 
                 ##### Show the resulting dataframe ####
 
