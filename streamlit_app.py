@@ -290,6 +290,9 @@ def main():
 
                 #Plot the second result
                 failure_per_turbine_per_year_excluded = failure_per_year_df.iloc[:-1]
+                if "Total_Failures" not in failure_per_turbine_per_year_excluded.columns:
+                    st.error("'Total_Failures' column is missing!")
+                    st.write(failure_per_turbine_per_year_excluded.head())
                 fig1 = px.bar(failure_per_turbine_per_year_excluded, y=failure_per_turbine_per_year_excluded.columns[:-1], title="Stacked Bar Chart of number of failures per Turbine",
                             labels={"value": "Failures per Turbine", "Year": "Year", "variable": "Turbine"}, 
                             barmode='stack')
