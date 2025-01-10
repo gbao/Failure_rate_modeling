@@ -289,15 +289,16 @@ def main():
                 st.plotly_chart(fig)
 
                 #Plot the second result
-                fig1 = px.bar(failure_per_turbine_per_year, y=failure_per_turbine_per_year.columns[:-1], title="Stacked Bar Chart of number of failures per Turbine",
+                failure_per_turbine_per_year_excluded = failure_per_year_df.iloc[:-1]
+                fig1 = px.bar(failure_per_turbine_per_year_excluded, y=failure_per_turbine_per_year_excluded.columns[:-1], title="Stacked Bar Chart of number of failures per Turbine",
                             labels={"value": "Failures per Turbine", "Year": "Year", "variable": "Turbine"}, 
                             barmode='stack')
                 fig1.add_trace(
                     go.Scatter(
-                        x=failure_per_turbine_per_year.index,
-                        y=failure_per_turbine_per_year["Total_Failures"],
+                        x=failure_per_turbine_per_year_excluded.index,
+                        y=failure_per_turbine_per_year_excluded["Total_Failures"],
                         mode="text",
-                        text=failure_per_turbine_per_year["Total_Failures"],
+                        text=failure_per_turbine_per_year_excluded["Total_Failures"],
                         textposition="top center",
                         showlegend=False
                     )
