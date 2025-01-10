@@ -223,6 +223,13 @@ def main():
             df_review = df.applymap(lambda x:x *100 if np.issubdtype(type(x), np.number) else x)
             st.write(df_review.head())
 
+
+            
+            if 'run_clicked' not in st.session_state:
+                st.session_state.run_clicked = False
+            if 'simulation_results' not in st.session_state:
+                st.session_state.simulation_results = None
+                
             if run_button:
                 st.write("Running simulation.....")
                 st.session_state.run_clicked = True
@@ -288,9 +295,9 @@ def main():
                 fig1.add_trace(
                     go.Scatter(
                         x=failure_per_turbine_per_year.index,
-                        y=failure_per_turbine_per_year["Total_Failures"],
+                        y=failure_per_turbine_per_year["Total_Failure"],
                         mode="text",
-                        text=failure_per_turbine_per_year["Total_Failures"],
+                        text=failure_per_turbine_per_year["Total_Failure"],
                         textposition="top center",
                         showlegend=False
                     )
